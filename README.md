@@ -91,10 +91,7 @@ pip install pdfplumber pandas openpyxl
      ```bash
      python task.py
      ```
-   - If using the executable:
-     ```bash
-     ./task.exe
-     ```
+   - If using the executable, just double click on it
 3. The output files (`invoice_data.xlsx` and `invoice_data.csv`) will be generated in the same directory.
 
 ---
