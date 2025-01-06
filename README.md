@@ -1,79 +1,132 @@
-
 # WerkStudent_Python
 
 ## Overview
+This script is designed to extract financial and date-related information from PDF files and save the results in Excel and CSV formats. It processes files in a specified directory, normalizing values and dates to a consistent format. The script also supports creating an executable file to ensure easy execution on systems without Python installed.
 
-This repository contains the interview task for the WerkStudent position in Python. The goal is to collect data from two sample invoices, create an Excel file with two sheets, and generate a CSV file. Additionally, an executable file should be provided to run the code.
+---
 
-## Task Details
+## Assumptions
+1. **Column Consistency:** All extracted values, regardless of type, are stored in the same column in the Excel file.
+2. **File Differences:**
+    - One type of file contains "Gross Total incl. VAT" values in euros, using the European number system (comma for decimals).
+    - The other type contains "Total" values in USD, using the standard number system (period for decimals).
+3. **Normalization:**
+    - Values in euros are converted to the standard number system.
+    - Currency symbols are stripped from all extracted values.
+4. **Date Handling:**
+    - Single dates are directly extracted.
+    - For date ranges, only the starting date is considered.
+    - All dates are normalized to the format `DD-MM-YYYY`.
 
-1. **Data Extraction**:
-    - Extract specific values from three sample invoices.
-    - For Sample 1, extract the value shown in the provided image.
-    - <img width="289" alt="image" src="https://github.com/user-attachments/assets/0cf000ff-c305-4ffe-beb4-1c02a04d06b6" />
-    - For Samples 2, extract the value shown in the provided image.
-    - <img width="497" alt="image" src="https://github.com/user-attachments/assets/ea6eb368-604d-4dd4-9235-fbc8ec36d275" />
+---
 
-2. **Excel File Creation**:
-    - Create an Excel file with two sheets:
-        - **Sheet 1**: Contains three columns - File Name, Date (scraped from the document), and Value.
-        - **Sheet 2**: Contains a pivot table with the date and value sum, and also by document name.
+## Core Functions
 
-3. **CSV File Creation**:
-    - Create a CSV file with all the data, including headers, and use a semicolon (;) as the separator.
+### 1. `get_directory_path`
+Ensures the correct file path is taken for both Python scripts and compiled executables, enabling the script to process files located in the same directory as the executable or script.
 
-4. **Executable File**:
-    - Provide an executable file (.exe) that can run the code if the files are in the same folder.
+### 2. `extract_value_from_pdf`
+This function extracts the target financial values ("Gross Total incl. VAT" or "Total") from the PDF files. The process involves:
+- Searching for a specified target string.
+- Extracting the value corresponding to the target string.
 
-5. **Fork Creation**:
-    - Create a fork of this repository named `LastName_FirstName_WerkStudent_Python` (e.g., `Shovon_Golam_WerkStudent_Python`).
-    - Upload your code to this branch. No need to submit a pull request; the fork will be checked directly.
+### 3. `normalize_value`
+Converts extracted financial values to a standard format by:
+- Replacing commas with periods (and vice versa) for the European number system.
+- Stripping currency symbols.
+- Ensuring consistent numerical representation.
 
-6. **Documentation**:
-    - Include an explanation in the README file that a non-technical person can understand.
-    - Ensure the code is documented so that a technical person can understand it.
+### 4. `extract_date_from_pdf` and `normalize_date`
+- **Date Extraction:** Extracts either a single date or a range of dates from the PDF.
+- **Normalization:** Converts all dates to the format `DD-MM-YYYY`. For date ranges, only the starting date is considered.
 
-7. **Problem Reporting**:
-    - If you face any problems or find it impossible to complete a task, document the issue in the README file of your branch. Explain what the problem was and why you were unable to complete it.
+### 5. `process_pdf_data`
+Processes all PDF files in the specified directory by:
+- Searching for the "Gross Total incl. VAT" string and extracting its value.
+- If the above string is not found, searching for "Total" instead and extracting its value.
+- Extracting dates and normalizing them.
+
+### 6. `save_data_to_files`
+Saves the extracted and processed data in the following formats:
+- **Excel:**
+  - Contains two sheets:
+    - Data Sheet: Stores the extracted values and dates.
+    - Pivot Table Sheet: Provides summarized data.
+- **CSV:** Contains all the data, including headers, and uses a semicolon (;) as the separator.
+
+### 7. **Creating an Executable File**
+The script can be converted into an executable file using PyInstaller. This allows it to run on systems without Python installed. Ensure PyInstaller is installed by running:
+
+```bash
+pip install pyinstaller
+```
+
+The command used to create the executable is:
+
+```bash
+pyinstaller --onefile task.py
+```
+
+---
+
+## Installation and Usage
+
+### Prerequisites
+- Python 3.7 or later (if running the script directly).
+- Required Python libraries:
+  - `Pdfplumber` (for PDF processing)
+  - `pandas` (for data handling)
+  - `openpyxl` (for Excel file creation)
+
+Install the required libraries using:
+
+```bash
+pip install pdfplumber pandas openpyxl
+```
+
+### Steps to Run the Script
+1. Place the PDF files in the same directory as the script or executable.
+2. Run the script:
+   - If using Python:
+     ```bash
+     python task.py
+     ```
+   - If using the executable:
+     ```bash
+     ./task.exe
+     ```
+3. The output files (`invoice_data.xlsx` and `invoice_data.csv`) will be generated in the same directory.
+
+---
+
+## Output Details
+- **Excel File:** Contains two sheets:
+  - `Data Sheet`: Stores extracted financial values and normalized dates.
+  - `Pivot Table Sheet`: Provides a summary of the data.
+- **CSV File:** A flat file containing the processed data.
+
+---
+
+## Directory Structure
+```
+project_directory/
+|-- task.py              # Python script
+|-- task.exe             # Executable file (if created)
+|-- sample_file_1.pdf    # Sample PDF file (Gross Total incl. VAT in euros)
+|-- sample_file_2.pdf    # Sample PDF file (Total in USD)
+|-- invoice_data.xlsx          # Extracted data in Excel format
+|-- invoice_data.csv           # Extracted data in CSV format
+```
+
+---
+
+## Limitations
+- The script assumes consistent formatting in the target PDFs.
+- Complex PDF layouts may require additional adjustments to the extraction logic.
+- Currency conversion is not handled; the script only normalizes and extracts values.
 
 
-## How It Works
+---
 
-1. **Data Extraction**:
-    - The script reads the sample invoices and extracts the required values.
-    - The extracted data is stored in variables for further processing.
-
-2. **Excel File Creation**:
-    - The script creates an Excel file with two sheets.
-    - Sheet 1 contains the file name, extracted data, and value.
-    - Sheet 2 contains a pivot table summarizing the data by date and document name.
-
-3. **CSV File Creation**:
-    - The script generates a CSV file with the extracted data, including headers, and uses a semicolon as the separator.
-
-4. **Executable File**:
-    - An executable file is provided to run the entire code. Ensure the sample invoices are in the same folder as the executable file.
-
-5. **Requirements File**:
-    -A requirements.txt file is included to create the environment needed to run the code
-
-## Running the Code
-
-1. Place the sample invoices in the same folder as the executable file.
-2. Run the executable file to execute the code and generate the Excel and CSV files.
-
-
-## Documentation
-
-- The README file contains a non-technical explanation of the code.
-- The code is documented with comments to help technical users understand its functionality.
-
-## Problem Reporting
-
-- If you face any problems or find it impossible to complete a task, document the issue in the README file of your branch. Explain what the problem was and why you were unable to complete it.
-
-## Timeline
-
-- The time limit for this task is 9 January 2025. 
-
-
+## Contact
+For any issues or inquiries, please contact shahzaib.beyg@gmail.com.
